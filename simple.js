@@ -22,4 +22,6 @@ Superiod.afterScriptLoad( "simple-demo", () => {
 
   const buttonRendered = button.render();
   $app.appendChild( buttonRendered );
-} );
+} ).catch( ( err ) => {
+  console.error( "An error occurred:" + err );
+} )
