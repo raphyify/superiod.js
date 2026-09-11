@@ -23,11 +23,11 @@ const superiodRegistry = new Map();
  * @param {*} value The value to copy.
  * @returns {*} A copy of the supplied value.
  */
-const clone = (value) => {
-  if (Array.isArray(value)) return value.map(clone);
-  if (value && typeof value === "object") {
+const clone = ( value ) => {
+  if ( Array.isArray( value ) ) return value.map( clone );
+  if ( value && typeof value === "object" ) {
     return Object.fromEntries(
-      Object.entries(value).map(([key, item]) => [key, clone(item)]),
+      Object.entries( value ).map( ( [ key, item ] ) => [ key, clone( item ) ] ),
     );
   }
   return value;
@@ -41,26 +41,26 @@ const clone = (value) => {
  * @param {object} addition The overriding style values.
  * @returns {object} The merged style object.
  */
-const merge = (base, addition) => {
-  const result = clone(base || {});
-  Object.entries(addition || {}).forEach(([key, value]) => {
-    result[key] =
-      value && typeof value === "object" && !Array.isArray(value)
-        ? merge(result[key], value)
-        : clone(value);
-  });
+const merge = ( base, addition ) => {
+  const result = clone( base || {} );
+  Object.entries( addition || {} ).forEach( ( [ key, value ] ) => {
+    result[ key ] =
+      value && typeof value === "object" && !Array.isArray( value )
+        ? merge( result[ key ], value )
+        : clone( value );
+  } );
   return result;
 };
 
 /** Converts a JavaScript style property into kebab-case CSS. */
-const cssName = (name) =>
-  name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+const cssName = ( name ) =>
+  name.replace( /[A-Z]/g, ( letter ) => `-${ letter.toLowerCase() }` );
 
 /** Converts a style name into a safe CSS class suffix. */
-const safeName = (name) =>
-  String(name)
+const safeName = ( name ) =>
+  String( name )
     .toLowerCase()
-    .replace(/[^a-z0-9_-]/g, "-");
+    .replace( /[^a-z0-9_-]/g, "-" );
 
 /**
  * Resolves a style and all of its inherited declarations.
@@ -70,16 +70,16 @@ const safeName = (name) =>
  * @returns {object} The fully resolved style definition.
  * @throws {Error} If the style is missing or inheritance is circular.
  */
-function resolveStyle(name, trail = []) {
-  const style = superiodRegistry.get(name);
-  if (!style) throw new Error(`Superiod style "${name}" is not registered.`);
-  if (trail.includes(name))
+function resolveStyle( name, trail = [] ) {
+  const style = superiodRegistry.get( name );
+  if ( !style ) throw new Error( `Superiod style "${ name }" is not registered.` );
+  if ( trail.includes( name ) )
     throw new Error(
-      `Circular Superiod style inheritance: ${trail.join(" -> ")} -> ${name}`,
+      `Circular Superiod style inheritance: ${ trail.join( " -> " ) } -> ${ name }`,
     );
   return style.extends
-    ? merge(resolveStyle(style.extends, [...trail, name]), style.definition)
-    : clone(style.definition);
+    ? merge( resolveStyle( style.extends, [ ...trail, name ] ), style.definition )
+    : clone( style.definition );
 }
 
 /**
@@ -89,11 +89,11 @@ function resolveStyle(name, trail = []) {
  * @param {object} declarations CSS property/value pairs.
  * @returns {string} A CSS rule string.
  */
-function addRule(selector, declarations) {
-  return `${selector}{${Object.entries(declarations || {})
-    .filter(([, value]) => value !== undefined && value !== null)
-    .map(([property, value]) => `${cssName(property)}:${value};`)
-    .join("")}}`;
+function addRule( selector, declarations ) {
+  return `${ selector }{${ Object.entries( declarations || {} )
+    .filter( ( [ , value ] ) => value !== undefined && value !== null )
+    .map( ( [ property, value ] ) => `${ cssName( property ) }:${ value };` )
+    .join( "" ) }}`;
 }
 
 /**
@@ -103,12 +103,12 @@ function addRule(selector, declarations) {
  * server-like runtime without a document.
  */
 function ensureStyleSheet() {
-  if (typeof document === "undefined") return null;
-  let sheet = document.getElementById("superiod-styles");
-  if (!sheet) {
-    sheet = document.createElement("style");
+  if ( typeof document === "undefined" ) return null;
+  let sheet = document.getElementById( "superiod-styles" );
+  if ( !sheet ) {
+    sheet = document.createElement( "style" );
     sheet.id = "superiod-styles";
-    document.head.appendChild(sheet);
+    document.head.appendChild( sheet );
   }
   return sheet;
 }
@@ -123,7 +123,7 @@ class Superiod {
    * @param {string|string[]} [$options.style] Style name or names to apply.
    * @param {object} [$options.attributes] HTML attributes for the element.
    */
-  constructor($options = {}) {
+  constructor( $options = {} ) {
     this.$label = $options.label || "";
     this.$type = $options.type || "div";
     this.$style = $options.style || this.$type;
@@ -143,12 +143,12 @@ class Superiod {
    * @param {string} [options.extends] Parent style name.
    * @returns {typeof Superiod} The class, enabling chained registrations.
    */
-  static define(name, definition = {}, options = {}) {
-    superiodRegistry.set(name, {
-      definition: clone(definition),
+  static define( name, definition = {}, options = {} ) {
+    superiodRegistry.set( name, {
+      definition: clone( definition ),
       extends: options.extends || null,
-    });
-    Superiod.inject(name);
+    } );
+    Superiod.inject( name );
     return Superiod;
   }
 
@@ -160,12 +160,12 @@ class Superiod {
    * @returns {typeof Superiod} The class, enabling chained extensions.
    * @throws {Error} If the style has not been registered.
    */
-  static extend(name, definition = {}) {
-    const existing = superiodRegistry.get(name);
-    if (!existing)
-      throw new Error(`Superiod style "${name}" is not registered.`);
-    existing.definition = merge(existing.definition, definition);
-    Superiod.inject(name);
+  static extend( name, definition = {} ) {
+    const existing = superiodRegistry.get( name );
+    if ( !existing )
+      throw new Error( `Superiod style "${ name }" is not registered.` );
+    existing.definition = merge( existing.definition, definition );
+    Superiod.inject( name );
     return Superiod;
   }
 
@@ -175,8 +175,8 @@ class Superiod {
    * @param {string} name The registered style name.
    * @returns {object} The resolved style definition.
    */
-  static style(name) {
-    return resolveStyle(name);
+  static style( name ) {
+    return resolveStyle( name );
   }
 
   /**
@@ -185,26 +185,26 @@ class Superiod {
    * @param {string} name The registered style name.
    * @returns {void}
    */
-  static inject(name) {
+  static inject( name ) {
     const sheet = ensureStyleSheet();
-    if (!sheet) return;
-    const style = resolveStyle(name);
-    const selector = `.superiod-${safeName(name)}`;
-    const rules = [addRule(selector, style.base || style)];
-    Object.entries(style).forEach(([state, declarations]) => {
-      if (state === "base" || typeof declarations !== "object") return;
-      const pseudo = state.startsWith(":") ? state : `:${state}`;
-      rules.push(addRule(`${selector}${pseudo}`, declarations));
-    });
+    if ( !sheet ) return;
+    const style = resolveStyle( name );
+    const selector = `.superiod-${ safeName( name ) }`;
+    const rules = [ addRule( selector, style.base || style ) ];
+    Object.entries( style ).forEach( ( [ state, declarations ] ) => {
+      if ( state === "base" || typeof declarations !== "object" ) return;
+      const pseudo = state.startsWith( ":" ) ? state : `:${ state }`;
+      rules.push( addRule( `${ selector }${ pseudo }`, declarations ) );
+    } );
     // Remove older rules so redefining a style cannot leave stale CSS behind.
-    for (let index = sheet.sheet.cssRules.length - 1; index >= 0; index -= 1) {
-      const rule = sheet.sheet.cssRules[index];
-      if (rule.selectorText === selector || rule.selectorText?.startsWith(`${selector}:`)) {
-        sheet.sheet.deleteRule(index);
+    for ( let index = sheet.sheet.cssRules.length - 1; index >= 0; index -= 1 ) {
+      const rule = sheet.sheet.cssRules[ index ];
+      if ( rule.selectorText === selector || rule.selectorText?.startsWith( `${ selector }:` ) ) {
+        sheet.sheet.deleteRule( index );
       }
     }
-    rules.forEach((rule) =>
-      sheet.sheet.insertRule(rule, sheet.sheet.cssRules.length),
+    rules.forEach( ( rule ) =>
+      sheet.sheet.insertRule( rule, sheet.sheet.cssRules.length ),
     );
   }
 
@@ -214,9 +214,9 @@ class Superiod {
    * @returns {string} Space-separated Superiod CSS classes.
    */
   classes() {
-    const styles = Array.isArray(this.$style) ? this.$style : [this.$style];
-    styles.forEach((name) => Superiod.inject(name));
-    return styles.map((name) => `superiod-${safeName(name)}`).join(" ");
+    const styles = Array.isArray( this.$style ) ? this.$style : [ this.$style ];
+    styles.forEach( ( name ) => Superiod.inject( name ) );
+    return styles.map( ( name ) => `superiod-${ safeName( name ) }` ).join( " " );
   }
 
   /**
@@ -230,12 +230,12 @@ class Superiod {
    * @param {boolean|AddEventListenerOptions} [options] Native listener options.
    * @returns {Superiod} This widget for method chaining.
    */
-  on(type, listener, options) {
-    const entries = this.$events.get(type) || new Set();
+  on( type, listener, options ) {
+    const entries = this.$events.get( type ) || new Set();
     const entry = { listener, options };
-    entries.add(entry);
-    this.$events.set(type, entries);
-    if (this.$element) this.$element.addEventListener(type, listener, options);
+    entries.add( entry );
+    this.$events.set( type, entries );
+    if ( this.$element ) this.$element.addEventListener( type, listener, options );
     return this;
   }
 
@@ -249,26 +249,26 @@ class Superiod {
    * @param {EventListenerOrEventListenerObject} [listener] One callback to remove.
    * @returns {Superiod} This widget for method chaining.
    */
-  off(type, listener) {
-    const types = type ? [type] : [...this.$events.keys()];
-    types.forEach((eventType) => {
-      const entries = this.$events.get(eventType);
-      if (!entries) return;
+  off( type, listener ) {
+    const types = type ? [ type ] : [ ...this.$events.keys() ];
+    types.forEach( ( eventType ) => {
+      const entries = this.$events.get( eventType );
+      if ( !entries ) return;
       const selected = listener
-        ? [...entries].filter((entry) => entry.listener === listener)
-        : [...entries];
-      selected.forEach((entry) => {
-        if (this.$element) {
+        ? [ ...entries ].filter( ( entry ) => entry.listener === listener )
+        : [ ...entries ];
+      selected.forEach( ( entry ) => {
+        if ( this.$element ) {
           this.$element.removeEventListener(
             eventType,
             entry.listener,
             entry.options,
           );
         }
-        entries.delete(entry);
-      });
-      if (!entries.size) this.$events.delete(eventType);
-    });
+        entries.delete( entry );
+      } );
+      if ( !entries.size ) this.$events.delete( eventType );
+    } );
     return this;
   }
 
@@ -279,51 +279,51 @@ class Superiod {
    * @returns {HTMLElement} The newly created element.
    * @throws {Error} If called without a browser document.
    */
-  render(target) {
-    if (typeof document === "undefined")
-      throw new Error("Superiod widgets require a browser document to render.");
-    const element = document.createElement(this.$type);
+  render( target ) {
+    if ( typeof document === "undefined" )
+      throw new Error( "Superiod widgets require a browser document to render." );
+    const element = document.createElement( this.$type );
     element.className = this.classes();
-    if (this.$label) element.textContent = this.$label;
-    Object.entries(this.$options.attributes || {}).forEach(([key, value]) =>
-      element.setAttribute(key, value),
+    if ( this.$label ) element.textContent = this.$label;
+    Object.entries( this.$options.attributes || {} ).forEach( ( [ key, value ] ) =>
+      element.setAttribute( key, value ),
     );
-    this.$events.forEach((entries, type) => {
-      entries.forEach(({ listener, options }) =>
-        element.addEventListener(type, listener, options),
+    this.$events.forEach( ( entries, type ) => {
+      entries.forEach( ( { listener, options } ) =>
+        element.addEventListener( type, listener, options ),
       );
-    });
+    } );
     this.$element = element;
-    if (target) target.appendChild(element);
+    if ( target ) target.appendChild( element );
     return element;
   }
 }
 
 class ButtonWidget extends Superiod {
   /** Creates a button widget using the button style by default. */
-  constructor(options = {}) {
-    super({ ...options, type: "button", style: options.style || "button" });
+  constructor( options = {} ) {
+    super( { ...options, type: "button", style: options.style || "button" } );
   }
 }
 
 class InputWidget extends Superiod {
   /** Creates a single-line input widget using the input style by default. */
-  constructor(options = {}) {
-    super({ ...options, type: "input", style: options.style || "input" });
+  constructor( options = {} ) {
+    super( { ...options, type: "input", style: options.style || "input" } );
   }
 }
 
 class TextareaWidget extends Superiod {
   /** Creates a multiline textarea using the textarea style by default. */
-  constructor(options = {}) {
-    super({ ...options, type: "textarea", style: options.style || "textarea" });
+  constructor( options = {} ) {
+    super( { ...options, type: "textarea", style: options.style || "textarea" } );
   }
 }
 
 // The utility style contains declarations shared by every built-in widget.
-Superiod.define("utility", {
+Superiod.define( "utility", {
   base: { boxSizing: "border-box", fontFamily: "inherit" },
-});
+} );
 // Buttons inherit the shared utility declarations and define interaction states.
 Superiod.define(
   "button",
@@ -368,7 +368,7 @@ Superiod.define(
   { extends: "utility" },
 );
 // Inputs inherit the complete field style without adding new declarations.
-Superiod.define("input", {}, { extends: "field" });
+Superiod.define( "input", {}, { extends: "field" } );
 
 // Textareas inherit fields and add multiline-specific sizing behavior.
 Superiod.define(
@@ -378,8 +378,8 @@ Superiod.define(
 );
 
 // Expose the main class globally when the library is loaded by a browser script.
-if (typeof window !== "undefined") window.Superiod = Superiod;
+if ( typeof window !== "undefined" ) window.Superiod = Superiod;
 
 // Expose the constructors when the library is loaded through CommonJS.
-if (typeof module !== "undefined")
+if ( typeof module !== "undefined" )
   module.exports = { Superiod, ButtonWidget, InputWidget, TextareaWidget };
