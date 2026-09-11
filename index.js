@@ -1,18 +1,9 @@
+import "./superiod.demo.styles.js";
+
 // Connect this browser demo to Superiod's declarations for editor hints.
 /// <reference path="./superiod/superiod.d.ts" />
 // Ask VS Code to type-check this JavaScript and provide inline diagnostics.
 // @ts-check
-
-// Create a crimson button variant while preserving the shared button shape,
-// spacing, typography, focus ring, and hover movement.
-Superiod.define(
-  "danger",
-  {
-    base: { background: "#be123c" },
-    hover: { background: "#9f1239" },
-  },
-  { extends: "button" },
-);
 
 // Find the page region where the form will become visible.
 const app = document.querySelector( "#app" );
@@ -48,6 +39,7 @@ const email = new InputWidget( {
     "aria-label": "Email address",
   },
 } );
+
 // Create a taller multiline field that inherits the same input styling.
 const message = new TextareaWidget( {
   attributes: {
@@ -66,8 +58,10 @@ const clear = new ButtonWidget( {
   label: "Clear",
   style: "danger",
   // Make the browser reset the form when this button is activated.
-  attributes: { type: "reset" },
+  // attributes: { type: "reset" },
 } );
+clear.setType( "reset" );
+
 // Create a neutral control used to demonstrate removing a widget event.
 const disableSend = new ButtonWidget( {
   label: "Disable send",
