@@ -23,7 +23,7 @@ Superiod is a lightweight, composable UI library for vanilla JavaScript. It prov
 ```js
 const button = new ButtonWidget( {
   label: "Click me",
-  style: "button",
+  style: "primary-button",
 } );
 
 button.on( "click", () => {
