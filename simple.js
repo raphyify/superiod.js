@@ -15,6 +15,17 @@ Superiod.afterScriptLoad( "simple-demo", () => {
     label: "Click me!",
     style: "button",
   } );
+  button.$suppressUsageWarning = true;
+  button.setValue( "I'm a button!" ).setLabel( "I'm a button!" );
+
+  const input = new InputWidget( {
+    // value: "Input",
+    // label: "Input",
+    type: "text",
+  } );
+  // input.$suppressUsageWarning = true;
+  input.setLabel( 'Type in your mind here...' ).setValue( 'Type in your mind here...' );
+  input.setType( "text" );
 
   button.on( "click", () => {
     button.setLabel( "You have clicked me!" );
@@ -22,7 +33,7 @@ Superiod.afterScriptLoad( "simple-demo", () => {
   } );
 
   const buttonRendered = button.render();
-  $app.appendChild( buttonRendered );
+  $app.append( buttonRendered, input.render() );
 } ).catch( ( err ) => {
   console.error( "An error occurred:" + err );
 } );

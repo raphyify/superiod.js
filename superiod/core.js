@@ -13,6 +13,8 @@ export class Superiod {
     this.$options = $options;
     this.$element = null;
     this.$events = new Map();
+    this.$useInstead = null;
+    this.$suppressUsageWarning = false;
   }
 
   static define( name, definition = {}, options = {} ) {
@@ -99,6 +101,46 @@ export class Superiod {
 
     this.$style = styleName;
     if ( this.$element ) this.$element.className = this.classes();
+    return this;
+  }
+
+  setLabel( value = "" ) {
+    const noInclude = [ "input", "textarea" ];
+
+    if ( !this.$suppressUsageWarning ) {
+      for ( let i = 0; i < noInclude.length; i++ ) {
+        if ( this.$type.includes( noInclude[ i ] ) ) {
+          console.warn( "Superiod.setLabel:", `Using setLabel on <${ this.$type }> tag. Use \`${ this.$useInstead }\` instead.` );
+          return this; // break early, but keep chainable
+        }
+      }
+    }
+
+    this.$label = value;
+    if ( this.$element ) this.$element.textContent = value;
+    return this;
+  }
+
+  setValue( value = "" ) {
+    if ( !this.$suppressUsageWarning ) {
+      // @fixme: using `.includes` and `.indexOf` always returns thruthy
+      if ( this.$type !== "input" ) {
+        if ( this.$type !== "textarea" ) {
+          console.warn( "Superiod.setValue:", `Using setValue on <${ this.$type }> tag. Use \`${ this.$useInstead }\` instead.` );
+          return this; // break early, but keep chainable
+        }
+      }
+    }
+
+    this.$options.attributes = { ...this.$options.attributes, value: value };
+    if ( this.$element ) this.$element.setAttribute( "value", value );
+    return this;
+  }
+
+  setType( value ) {
+    if ( !value ) return false;
+    this.$options.attributes = { ...this.$options.attributes, type: value };
+    if ( this.$element ) this.$element.setAttribute( "type", value );
     return this;
   }
 
