@@ -59,7 +59,7 @@ Superiod.define( "primary-button", {
 
 ## Running the PHP demo
 
-There is a folder called `demo` provided for testing `Superiod.Api`. To run the demo make sure you have at least or above PHP v7.5, then open your terminal in the project root folder where the `superiod` folder that contains the core code for the library is located and run the following code specifying a port (e.g. 8080):
+There is a folder called `demo` provided for testing `Superiod.Api`. To run the demo make sure you have at least or above PHP v7.5, then open your terminal in the project root folder where the `superiod` folder that contains the core code for the library is located and run the following code specifying a port (e.g.: 8080):
 
 ```powershell
 php -S localhost:8080
