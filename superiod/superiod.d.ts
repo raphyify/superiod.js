@@ -76,6 +76,8 @@ export class Superiod {
         callback: () => void,
     ): Promise<void>;
 
+    static importScript(script: string): Promise<void>;
+
     static Api(url: string, rules: ApiRules, options?: ApiOptions): ApiClient;
     static Api(
         options: ApiOptions & { url: string; rules?: ApiRules },

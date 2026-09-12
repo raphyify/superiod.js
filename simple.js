@@ -5,6 +5,7 @@ import "./superiod.demo.styles.js";
 // Ask VS Code to type-check this JavaScript and provide inline diagnostics.
 // @ts-check
 
+Superiod.importScript( "./sample.js" );
 Superiod.afterScriptLoad( "simple-demo", () => {
   const $app = document.querySelector( "#app" );
   if ( !$app )
@@ -24,4 +25,4 @@ Superiod.afterScriptLoad( "simple-demo", () => {
   $app.appendChild( buttonRendered );
 } ).catch( ( err ) => {
   console.error( "An error occurred:" + err );
-} )
+} );

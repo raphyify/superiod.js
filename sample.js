@@ -1,0 +1,1 @@
+console.log( "Hello World!", "This script was imported using Superiod.importScript()" );
